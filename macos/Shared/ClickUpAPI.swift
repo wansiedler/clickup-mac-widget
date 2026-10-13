@@ -73,7 +73,9 @@ struct ClickUpAPI {
             guard let first = try await workspaces().first else { throw ClickUpError.noWorkspace }
             teamId = first.id
         }
-        async let tasks = myOpenTasks(teamId: teamId, userId: try await uid)
+        // An async let initializer cannot capture another async let, so resolve the user first.
+        let userId = try await uid
+        async let tasks = myOpenTasks(teamId: teamId, userId: userId)
         // A failing timer endpoint must not blank the task list.
         let timer: CUTimeEntry? = (try? await currentTimer(teamId: teamId)) ?? nil
         return Snapshot.make(tasks: try await tasks, timer: timer, teamId: teamId, now: now)
