@@ -123,18 +123,18 @@ private struct Counter: View {
 
 private struct ListView: View {
     struct Item: Identifiable {
-        let task: CUTask
+        let row: Snapshot.Row
         let tint: Color
-        var id: String { task.id }
+        var id: String { row.id }
     }
 
     let s: Snapshot
     let limit: Int
 
     private var items: [Item] {
-        let all = s.overdue.map { Item(task: $0, tint: .red) }
-            + s.today.map { Item(task: $0, tint: .orange) }
-            + s.upcoming.map { Item(task: $0, tint: .secondary) }
+        let all = s.overdue.map { Item(row: $0, tint: .red) }
+            + s.today.map { Item(row: $0, tint: .orange) }
+            + s.upcoming.map { Item(row: $0, tint: .secondary) }
         return Array(all.prefix(s.timer == nil ? limit : limit - 1))
     }
 
@@ -155,7 +155,7 @@ private struct ListView: View {
                 Spacer()
                 Text("Nothing due").font(.caption).foregroundStyle(.secondary).frame(maxWidth: .infinity)
             }
-            ForEach(items) { TaskRow(task: $0.task, tint: $0.tint) }
+            ForEach(items) { TaskRow(row: $0.row, tint: $0.tint) }
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -163,20 +163,54 @@ private struct ListView: View {
 }
 
 private struct TaskRow: View {
-    let task: CUTask
+    let row: Snapshot.Row
     let tint: Color
 
     var body: some View {
+        let task = row.task
         Link(destination: URL(string: task.url) ?? ClickUpAPI.appURL) {
-            HStack(spacing: 6) {
-                Circle().fill(Color(hex: task.status.color) ?? .gray).frame(width: 6, height: 6)
-                Text(task.name).font(.caption).lineLimit(1)
+            HStack(spacing: 5) {
+                if row.depth > 0 {
+                    Image(systemName: "arrow.turn.down.right")
+                        .font(.system(size: 8, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .padding(.leading, CGFloat(row.depth - 1) * 10)
+                }
+                Text(task.ticket)
+                    .font(.system(size: 9, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .fixedSize()
+                if let parent = row.parentName {
+                    Text("\(parent) ›").font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+                }
+                Text(task.name).font(.caption).lineLimit(1).layoutPriority(1)
                 Spacer(minLength: 4)
+                StatusPill(status: task.status)
                 if let due = task.due {
-                    Text(due, format: .dateTime.month(.abbreviated).day()).font(.caption2).foregroundStyle(tint)
+                    Text(due, format: .dateTime.month(.abbreviated).day())
+                        .font(.caption2).foregroundStyle(tint).fixedSize()
                 }
             }
         }
+    }
+}
+
+/// Status name on its ClickUp colour. The text keeps it readable when macOS
+/// renders the widget monochrome.
+private struct StatusPill: View {
+    let status: CUTask.Status
+
+    var body: some View {
+        let color = Color(hex: status.color) ?? .gray
+        Text(status.status.uppercased())
+            .font(.system(size: 8, weight: .bold))
+            .lineLimit(1)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 2)
+            .foregroundStyle(color)
+            .background(color.opacity(0.22), in: Capsule())
+            .fixedSize()
     }
 }
 

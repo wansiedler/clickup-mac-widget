@@ -78,7 +78,24 @@ struct ClickUpAPI {
         async let tasks = myOpenTasks(teamId: teamId, userId: userId)
         // A failing timer endpoint must not blank the task list.
         let timer: CUTimeEntry? = (try? await currentTimer(teamId: teamId)) ?? nil
-        return Snapshot.make(tasks: try await tasks, timer: timer, teamId: teamId, now: now)
+        let all = try await tasks
+        let missing = Set(all.compactMap(\.parent)).subtracting(all.map(\.id))
+        let parents = await taskNames(Array(missing.prefix(15)))
+        return Snapshot.make(tasks: all, timer: timer, teamId: teamId, parentNames: parents, now: now)
+    }
+
+    /// Names of parent tasks that are not assigned to me; failures are skipped.
+    func taskNames(_ ids: [String]) async -> [String: String] {
+        await withTaskGroup(of: (String, String?).self) { group in
+            for id in ids {
+                group.addTask { (id, try? await get("task/\(id)", as: TaskName.self).name) }
+            }
+            var out: [String: String] = [:]
+            for await (id, name) in group {
+                if let name { out[id] = name }
+            }
+            return out
+        }
     }
 
     // MARK: Transport
@@ -112,6 +129,10 @@ struct ClickUpAPI {
 private struct UserResponse: Decodable {
     struct User: Decodable { let id: Int }
     let user: User
+}
+
+private struct TaskName: Decodable {
+    let name: String
 }
 
 private struct TeamsResponse: Decodable {
