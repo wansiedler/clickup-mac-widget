@@ -1,0 +1,68 @@
+# XcodeGen spec: `xcodegen` here produces ClickUpWidget.xcodeproj (not committed).
+name: ClickUpWidget
+options:
+  bundleIdPrefix: com.wansiedler
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    # Set to your Apple team ID (a free personal team works for local use),
+    # or pick it in Xcode → Signing & Capabilities after generating.
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: YES
+
+targets:
+  ClickUpWidget:
+    type: application
+    platform: macOS
+    sources: [App, Shared]
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: ClickUp Widget
+        LSApplicationCategoryType: public.app-category.productivity
+        KeychainAccessGroup: $(AppIdentifierPrefix)com.wansiedler.clickupwidget
+    entitlements:
+      path: App/App.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        keychain-access-groups:
+          - $(AppIdentifierPrefix)com.wansiedler.clickupwidget
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.wansiedler.clickupwidget
+    dependencies:
+      - target: ClickUpWidgetExtension
+        embed: true
+
+  ClickUpWidgetExtension:
+    type: app-extension
+    platform: macOS
+    sources: [Widget, Shared]
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: ClickUp
+        KeychainAccessGroup: $(AppIdentifierPrefix)com.wansiedler.clickupwidget
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Widget/Widget.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        keychain-access-groups:
+          - $(AppIdentifierPrefix)com.wansiedler.clickupwidget
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.wansiedler.clickupwidget.widget
+    dependencies:
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
