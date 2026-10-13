@@ -11,7 +11,9 @@ calls and sort tasks the same way:
 | Stop timer | button in the widget (AppIntent) | menu item |
 
 Both show **my open tasks** in four groups: overdue, due today, upcoming, no due date.
-They also show the **running timer**. Clicking a task opens it in ClickUp.
+They also show the **running timer**. Each task shows its ticket number (custom ID, or
+`#id`), its status in the status colour, and its subtasks nested under it. Clicking a task
+opens it in ClickUp.
 
 Auth is a personal API token: ClickUp → avatar → Settings → Apps → API Token (`pk_…`).
 The two widgets keep the token in different places (see below), because a sandboxed
@@ -41,6 +43,10 @@ cd macos && xcodegen && open ClickUpWidget.xcodeproj
 2. Run the `ClickUpWidget` scheme. Paste the token, pick a workspace, then click
    **Save & test**.
 3. Right-click the desktop → Edit Widgets → ClickUp.
+
+By default macOS draws desktop widgets monochrome while the desktop is not in focus, so the
+red overdue dates and status colours turn grey. To keep them: System Settings → Desktop &
+Dock → Widgets → Widget style → Full-color. Status names stay readable either way.
 
 The app icon is drawn in `macos/icon/AppIcon.svg`. After editing it, re-render the asset
 catalog with `uv run --with cairosvg macos/icon/make_icons.py`.

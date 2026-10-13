@@ -16,14 +16,16 @@ def ms(d: dt.datetime) -> str:
     return str(int(d.timestamp() * 1000))
 
 
-def task(tid, name, due=None, prio=None):
+def task(tid, name, due=None, prio=None, parent=None, custom_id=None):
     return {
         "id": tid,
+        "parent": parent,
+        "custom_id": custom_id,
         "name": name,
         "url": f"https://app.clickup.com/t/{tid}",
         "due_date": ms(due) if due else None,
         "priority": {"priority": prio} if prio else None,
-        "status": {"status": "in progress"},
+        "status": {"status": "in progress", "color": "#3e63dd"},
         "list": {"name": "Sprint"},
     }
 
@@ -39,10 +41,34 @@ TASKS = [
 
 def test_bucket():
     b = cu.bucket(TASKS, NOW)
-    assert [t["id"] for t in b["overdue"]] == ["a"]
-    assert [t["id"] for t in b["today"]] == ["b", "c"]
-    assert [t["id"] for t in b["upcoming"]] == ["d"]
-    assert [t["id"] for t in b["nodate"]] == ["e"]
+    assert [r[0]["id"] for r in b["overdue"]] == ["a"]
+    assert [r[0]["id"] for r in b["today"]] == ["b", "c"]
+    assert [r[0]["id"] for r in b["upcoming"]] == ["d"]
+    assert [r[0]["id"] for r in b["nodate"]] == ["e"]
+
+
+def test_nesting():
+    tasks = [
+        task("p", "parent", NOW.replace(hour=10)),
+        task("k1", "child", NOW.replace(hour=9), parent="p"),
+        task("k2", "grandchild", NOW.replace(hour=11), parent="k1"),
+        task("o", "orphan", NOW.replace(hour=12), parent="x"),
+        task("u", "child elsewhere", NOW + dt.timedelta(days=2), parent="p"),
+    ]
+    b = cu.bucket(tasks, NOW, {"x": "Epic"})
+    # child sorts before its parent by due date, but is placed under it
+    assert [(r[0]["id"], r[1], r[2]) for r in b["today"]] == [
+        ("p", 0, None), ("k1", 1, None), ("k2", 2, None), ("o", 0, "Epic"),
+    ]
+    assert [(r[0]["id"], r[1], r[2]) for r in b["upcoming"]] == [("u", 0, "parent")]
+    lines = cu.render(b, None, NOW, "/p")
+    assert "  ↳ #k1  child | href=https://app.clickup.com/t/k1 color=#3e63dd trim=false" in lines
+    assert "#o  Epic › orphan | href=https://app.clickup.com/t/o color=#3e63dd" in lines
+
+
+def test_custom_id():
+    rows = cu.bucket([task("z", "named", custom_id="DEV-42")], NOW)["nodate"]
+    assert cu.task_lines(rows[0], "")[0].startswith("DEV-42  named | ")
 
 
 def test_render_title_and_escaping():
@@ -50,7 +76,7 @@ def test_render_title_and_escaping():
     lines = cu.render(cu.bucket(TASKS, NOW), timer, NOW, "/p/clickup.5m.py")
     assert lines[0].startswith("1:23 · 3 | sfimage=timer color=")
     assert any(line.startswith('Stop timer | shell="/p/clickup.5m.py" param1=stop') for line in lines)
-    assert "--pipe ¦ name | href=https://app.clickup.com/t/e" in lines
+    assert "--#e  pipe ¦ name | href=https://app.clickup.com/t/e color=#3e63dd" in lines
 
 
 def test_render_nothing_due():
