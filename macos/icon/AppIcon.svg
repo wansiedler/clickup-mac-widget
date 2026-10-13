@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- macOS icon grid: 824x824 body centered on a 1024 canvas. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#0891B2"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.18"/>
+    </linearGradient>
+  </defs>
+  <rect x="100" y="112" width="824" height="824" rx="185" fill="#000" opacity="0.22"/>
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#bg)"/>
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#shade)"/>
+
+  <rect x="248" y="244" width="528" height="556" rx="72" fill="#000" opacity="0.15"/>
+  <rect x="248" y="228" width="528" height="556" rx="72" fill="#FFFFFF"/>
+
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="352" cy="352" r="42" fill="#22C55E"/>
+    <path d="M332 353 l15 15 l27 -31" fill="none" stroke="#FFF" stroke-width="15"/>
+    <rect x="422" y="337" width="270" height="30" rx="15" fill="#CBD5E1"/>
+
+    <circle cx="352" cy="506" r="42" fill="#22C55E"/>
+    <path d="M332 507 l15 15 l27 -31" fill="none" stroke="#FFF" stroke-width="15"/>
+    <rect x="422" y="491" width="214" height="30" rx="15" fill="#CBD5E1"/>
+
+    <circle cx="352" cy="660" r="36" fill="none" stroke="#94A3B8" stroke-width="13"/>
+    <rect x="422" y="645" width="150" height="30" rx="15" fill="#64748B"/>
+  </g>
+
+  <g transform="translate(748 748)">
+    <circle r="132" fill="#FFFFFF"/>
+    <circle r="110" fill="#F97316"/>
+    <g stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" fill="none">
+      <path d="M0 -62 V0 L42 30"/>
+    </g>
+  </g>
+</svg>

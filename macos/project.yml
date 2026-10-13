@@ -38,6 +38,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.wansiedler.clickupwidget
+        # Rendered from icon/AppIcon.svg by icon/make_icons.py.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     dependencies:
       - target: ClickUpWidgetExtension
         embed: true
