@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-# <xbar.title>ClickUp</xbar.title>
+# <xbar.title>ClickUp My Tasks</xbar.title>
 # <xbar.version>v0.1.0</xbar.version>
-# <xbar.author>wansiedler</xbar.author>
-# <xbar.desc>My open ClickUp tasks (overdue, due today, upcoming) and the running timer.</xbar.desc>
+# <xbar.author>Alexander Wansiedler</xbar.author>
+# <xbar.author.github>wansiedler</xbar.author.github>
+# <xbar.desc>Your open ClickUp tasks grouped as overdue, due today, upcoming and undated, plus the running time tracker with a stop button. Click a task to open it.</xbar.desc>
 # <xbar.dependencies>python3</xbar.dependencies>
+# <xbar.abouturl>https://github.com/wansiedler/clickup-mac-widget</xbar.abouturl>
+#
+# <xbar.var>string(CLICKUP_TOKEN=""): Personal API token (pk_...). Leave empty to read it from the keychain instead</xbar.var>
 # <xbar.var>string(CLICKUP_TEAM_ID=""): Workspace id; empty = first workspace</xbar.var>
+#
 # <swiftbar.hideAbout>true</swiftbar.hideAbout>
 # <swiftbar.hideRunInTerminal>true</swiftbar.hideRunInTerminal>
 """SwiftBar / xbar plugin for ClickUp.
