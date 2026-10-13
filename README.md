@@ -42,5 +42,8 @@ cd macos && xcodegen && open ClickUpWidget.xcodeproj
    **Save & test**.
 3. Right-click the desktop → Edit Widgets → ClickUp.
 
+The app icon is drawn in `macos/icon/AppIcon.svg`. After editing it, re-render the asset
+catalog with `uv run --with cairosvg macos/icon/make_icons.py`.
+
 The token lives in the data-protection keychain, in the access group
 `<TeamID>.com.wansiedler.clickupwidget`. The app and the extension share that group.
